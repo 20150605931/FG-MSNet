@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 ## Environment
 
 - Pytorch 1.7.1+
@@ -73,9 +72,4 @@ If you need data, please contact the authors by email in time.
     }
 
     this repo is based on [repo](https://github.com/Fafa-DL/Awesome-Backbones)
-=======
-We will update the description of this code in the future!
->>>>>>> 57cb3e30c48ed2b486c833206cec35a3b884501e
-=======
 
->>>>>>> 4399d1884b4cd44d7e55951e26425cf33f978b48
