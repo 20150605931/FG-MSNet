@@ -18,7 +18,7 @@ def main():
     '''
 
     split_rate = 0.2
-    init_dataset = './data/shenbing/png'
+    init_dataset = './data/format'
     new_dataset = './datasets'
     random.seed(rand_seed)
 
@@ -54,9 +54,9 @@ def main():
         print()
 
 def kfold_split(k_num=5):
-    init_dataset = './datas/class5_wash_format'
+    init_dataset = './data/format'
     classes_name = [name for name in os.listdir(init_dataset)]
-    new_dataset = '.datasets'
+    new_dataset = './datasets'
     for cla in classes_name:
         class_path = os.path.join(init_dataset, cla)
         img_set = os.listdir(class_path)

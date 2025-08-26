@@ -1,7 +1,7 @@
 import os
 
 import cv2
-data_dir = "./datas/class5_wash"
+data_dir = "./datas/RGB"
 format_data_dir = "./datas/format"
 
 if __name__ == '__main__':

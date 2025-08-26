@@ -115,7 +115,6 @@ def main(args):
     model = model.to(device)
     if device != torch.device('cpu'):
         model = DataParallel(model,device_ids=[0])
-        print('AAAA')
     # model.cuda()
     # if torch.cuda.device_count() > 1:
     #     print(f"Using {torch.cuda.device_count()} GPUs!")

@@ -1,0 +1,5 @@
+FA 0
+MG 1
+HC 2
+PTC 3
+FTC 4

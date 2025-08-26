@@ -1,22 +1,19 @@
 # model settings
-part_num=5
+
 model_cfg = dict(
     backbone=dict(
-        type='ResPartNet',
-        part_num=part_num
-    ),
-    neck=dict(
-        type='PartGlobalAveragePooling_SP',
-        part_num=part_num
-    ),
+        type='ResNet',
+        depth=50,
+        num_stages=4,
+        out_indices=(3, ),
+        style='pytorch'),
+    neck=dict(type='GlobalAveragePooling'),
     head=dict(
-        type='WeightedPartClsHead_SP',
+        type='LinearClsHead',
         num_classes=4,
         in_channels=2048,
-        loss=dict(type='focal_loss'),
-        part_num=part_num,
-        # axu_loss=dict(type='TripletLoss', loss_weight=1.0),
-        topk=(1, 5)))
+        loss=dict(type='CrossEntropyLoss', loss_weight=1.0),
+        topk=(1, 5),))
 
 # dataloader pipeline
 img_lighting_cfg = dict(
@@ -28,30 +25,30 @@ img_lighting_cfg = dict(
 policies = [
     dict(type='AutoContrast', prob=0.5),
     dict(type='Equalize', prob=0.5),
-    # dict(type='Invert', prob=0.5),
-    # dict(
-    #     type='Rotate',
-    #     magnitude_key='angle',
-    #     magnitude_range=(0, 30),
-    #     pad_val=0,
-    #     prob=0.5,
-    #     random_negative_prob=0.5),
+    dict(type='Invert', prob=0.5),
+    dict(
+        type='Rotate',
+        magnitude_key='angle',
+        magnitude_range=(0, 30),
+        pad_val=0,
+        prob=0.5,
+        random_negative_prob=0.5),
     dict(
         type='Posterize',
         magnitude_key='bits',
         magnitude_range=(0, 4),
         prob=0.5),
-    # dict(
-    #     type='Solarize',
-    #     magnitude_key='thr',
-    #     magnitude_range=(0, 256),
-    #     prob=0.5),
-    # dict(
-    #     type='SolarizeAdd',
-    #     magnitude_key='magnitude',
-    #     magnitude_range=(0, 110),
-    #     thr=128,
-    #     prob=0.5),
+    dict(
+        type='Solarize',
+        magnitude_key='thr',
+        magnitude_range=(0, 256),
+        prob=0.5),
+    dict(
+        type='SolarizeAdd',
+        magnitude_key='magnitude',
+        magnitude_range=(0, 110),
+        thr=128,
+        prob=0.5),
     dict(
         type='ColorTransform',
         magnitude_key='magnitude',
@@ -76,46 +73,46 @@ policies = [
         magnitude_range=(-0.9, 0.9),
         prob=0.5,
         random_negative_prob=0.),
-    # dict(
-    #     type='Shear',
-    #     magnitude_key='magnitude',
-    #     magnitude_range=(0, 0.3),
-    #     pad_val=0,
-    #     prob=0.5,
-    #     direction='horizontal',
-    #     random_negative_prob=0.5),
-    # dict(
-    #     type='Shear',
-    #     magnitude_key='magnitude',
-    #     magnitude_range=(0, 0.3),
-    #     pad_val=0,
-    #     prob=0.5,
-    #     direction='vertical',
-    #     random_negative_prob=0.5),
+    dict(
+        type='Shear',
+        magnitude_key='magnitude',
+        magnitude_range=(0, 0.3),
+        pad_val=0,
+        prob=0.5,
+        direction='horizontal',
+        random_negative_prob=0.5),
+    dict(
+        type='Shear',
+        magnitude_key='magnitude',
+        magnitude_range=(0, 0.3),
+        pad_val=0,
+        prob=0.5,
+        direction='vertical',
+        random_negative_prob=0.5),
     dict(
         type='Cutout',
         magnitude_key='shape',
         magnitude_range=(1, 41),
         pad_val=0,
         prob=0.5),
-    # dict(
-    #     type='Translate',
-    #     magnitude_key='magnitude',
-    #     magnitude_range=(0, 0.3),
-    #     pad_val=0,
-    #     prob=0.5,
-    #     direction='horizontal',
-    #     random_negative_prob=0.5,
-    #     interpolation='bicubic'),
-    # dict(
-    #     type='Translate',
-    #     magnitude_key='magnitude',
-    #     magnitude_range=(0, 0.3),
-    #     pad_val=0,
-    #     prob=0.5,
-    #     direction='vertical',
-    #     random_negative_prob=0.5,
-    #     interpolation='bicubic')
+    dict(
+        type='Translate',
+        magnitude_key='magnitude',
+        magnitude_range=(0, 0.3),
+        pad_val=0,
+        prob=0.5,
+        direction='horizontal',
+        random_negative_prob=0.5,
+        interpolation='bicubic'),
+    dict(
+        type='Translate',
+        magnitude_key='magnitude',
+        magnitude_range=(0, 0.3),
+        pad_val=0,
+        prob=0.5,
+        direction='vertical',
+        random_negative_prob=0.5,
+        interpolation='bicubic')
 ]
 train_pipeline = [
     dict(type='LoadImageFromFile'),
@@ -130,7 +127,7 @@ train_pipeline = [
         efficientnet_style=True,
         interpolation='bicubic',
         backend='pillow'),
-    dict(type='RandomFlip', flip_prob=0.5, direction='horizontal'),         ###
+    dict(type='RandomFlip', flip_prob=0.5, direction='horizontal'),
     dict(type='ColorJitter', brightness=0.4, contrast=0.4, saturation=0.4),
     dict(type='Lighting', **img_lighting_cfg),
     dict(
@@ -180,14 +177,14 @@ data_cfg = dict(
     batch_size = 32,
     num_workers = 4,
     train = dict(
-        pretrained_flag = False,
-        pretrained_weights = '',
+        pretrained_flag = True,
+        pretrained_weights = './pretrain/resnet50-19c8e357.pth',
         freeze_flag = False,
         freeze_layers = ('backbone',),
         epoches = 100,
     ),
     test=dict(
-        ckpt = '',
+        ckpt = '/home/jiyarong/MS-FGNET-kidney/logs/ResNet/2025-07-30-19-05-53/Val_Epoch082-Acc92.500.pth',
         metrics = ['accuracy', 'precision', 'recall', 'f1_score', 'confusion'],
         metric_options = dict(
             topk = (1,5),
@@ -202,10 +199,8 @@ data_cfg = dict(
 # optimizer
 optimizer_cfg = dict(
     type='Adam',
-    lr=0.0001)
+    lr=0.001)
 
 # learning 
 lr_config = dict(type='StepLrUpdater', step=[30, 60, 90])
-#lr_config = dict(type='CosineAnnealingLrUpdater')
-
 
